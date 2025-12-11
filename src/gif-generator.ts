@@ -57,7 +57,7 @@ export const handler = async (event: LambdaEvent) => {
       `${giphyBaseUrl}?api_key=${giphyAPIKey}&q=${prompt}&limit=1`
     );
 
-    const data: GiphyResponse = (await response.json()) as GiphyResponse;
+    const data: GiphyResponse = await response.json()
 
     const gifUrl = data.data[0]?.images.original.url;
     console.log(gifUrl);
