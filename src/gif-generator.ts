@@ -57,17 +57,28 @@ export const handler = async (event: LambdaEvent) => {
       `${giphyBaseUrl}?api_key=${giphyAPIKey}&q=${prompt}&limit=1`
     );
 
-    const data: GiphyResponse = await response.json()
+    const data: GiphyResponse = await response.json();
 
     const gifUrl = data.data[0]?.images.original.url;
     console.log(gifUrl);
 
+
+    if (!gifUrl) {
+      throw new Error("GIF URL not found");
+    }
+
+    const gifResponse = await fetch(gifUrl);
+    const arrayBuffer = await gifResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
     return {
-      statusCode: 302,
+      statusCode: 200,
       headers: {
-        Location: gifUrl,
+        "Content-Type": "image/gif",
+        "Cache-Control": "no-cache",
       },
-      body: "",
+      body: buffer.toString("base64"),
+      isBase64Encoded: true,
     };
   } catch (error) {
     console.error(error);
